@@ -8,38 +8,49 @@ var ollamaJs = (() => {
       __defProp(target, name, { get: all[name], enumerable: true });
   };
   var __copyProps = (to, from, except, desc) => {
-    if (from && typeof from === "object" || typeof from === "function") {
+    if ((from && typeof from === "object") || typeof from === "function") {
       for (let key of __getOwnPropNames(from))
         if (!__hasOwnProp.call(to, key) && key !== except)
-          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+          __defProp(to, key, {
+            get: () => from[key],
+            enumerable:
+              !(desc = __getOwnPropDesc(from, key)) || desc.enumerable,
+          });
     }
     return to;
   };
-  var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+  var __toCommonJS = (mod) =>
+    __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
   // node_modules/.pnpm/ollama@0.5.11/node_modules/ollama/dist/browser.mjs
   var browser_exports = {};
   __export(browser_exports, {
     Ollama: () => Ollama$1,
-    default: () => browser
+    default: () => browser,
   });
 
   // node_modules/.pnpm/whatwg-fetch@3.6.20/node_modules/whatwg-fetch/fetch.js
-  var g = typeof globalThis !== "undefined" && globalThis || typeof self !== "undefined" && self || // eslint-disable-next-line no-undef
-  typeof global !== "undefined" && global || {};
+  var g =
+    (typeof globalThis !== "undefined" && globalThis) ||
+    (typeof self !== "undefined" && self) || // eslint-disable-next-line no-undef
+    (typeof global !== "undefined" && global) ||
+    {};
   var support = {
     searchParams: "URLSearchParams" in g,
     iterable: "Symbol" in g && "iterator" in Symbol,
-    blob: "FileReader" in g && "Blob" in g && function() {
-      try {
-        new Blob();
-        return true;
-      } catch (e) {
-        return false;
-      }
-    }(),
+    blob:
+      "FileReader" in g &&
+      "Blob" in g &&
+      (function () {
+        try {
+          new Blob();
+          return true;
+        } catch (e) {
+          return false;
+        }
+      })(),
     formData: "FormData" in g,
-    arrayBuffer: "ArrayBuffer" in g
+    arrayBuffer: "ArrayBuffer" in g,
   };
   function isDataView(obj) {
     return obj && DataView.prototype.isPrototypeOf(obj);
@@ -54,11 +65,15 @@ var ollamaJs = (() => {
       "[object Int32Array]",
       "[object Uint32Array]",
       "[object Float32Array]",
-      "[object Float64Array]"
+      "[object Float64Array]",
     ];
-    isArrayBufferView = ArrayBuffer.isView || function(obj) {
-      return obj && viewClasses.indexOf(Object.prototype.toString.call(obj)) > -1;
-    };
+    isArrayBufferView =
+      ArrayBuffer.isView ||
+      function (obj) {
+        return (
+          obj && viewClasses.indexOf(Object.prototype.toString.call(obj)) > -1
+        );
+      };
   }
   var viewClasses;
   var isArrayBufferView;
@@ -67,7 +82,9 @@ var ollamaJs = (() => {
       name = String(name);
     }
     if (/[^a-z0-9\-#$%&'*+.^_`|~!]/i.test(name) || name === "") {
-      throw new TypeError('Invalid character in header field name: "' + name + '"');
+      throw new TypeError(
+        'Invalid character in header field name: "' + name + '"'
+      );
     }
     return name.toLowerCase();
   }
@@ -79,13 +96,13 @@ var ollamaJs = (() => {
   }
   function iteratorFor(items) {
     var iterator = {
-      next: function() {
+      next: function () {
         var value = items.shift();
         return { done: value === void 0, value };
-      }
+      },
     };
     if (support.iterable) {
-      iterator[Symbol.iterator] = function() {
+      iterator[Symbol.iterator] = function () {
         return iterator;
       };
     }
@@ -94,65 +111,68 @@ var ollamaJs = (() => {
   function Headers(headers) {
     this.map = {};
     if (headers instanceof Headers) {
-      headers.forEach(function(value, name) {
+      headers.forEach(function (value, name) {
         this.append(name, value);
       }, this);
     } else if (Array.isArray(headers)) {
-      headers.forEach(function(header) {
+      headers.forEach(function (header) {
         if (header.length != 2) {
-          throw new TypeError("Headers constructor: expected name/value pair to be length 2, found" + header.length);
+          throw new TypeError(
+            "Headers constructor: expected name/value pair to be length 2, found" +
+              header.length
+          );
         }
         this.append(header[0], header[1]);
       }, this);
     } else if (headers) {
-      Object.getOwnPropertyNames(headers).forEach(function(name) {
+      Object.getOwnPropertyNames(headers).forEach(function (name) {
         this.append(name, headers[name]);
       }, this);
     }
   }
-  Headers.prototype.append = function(name, value) {
+  Headers.prototype.append = function (name, value) {
     name = normalizeName(name);
     value = normalizeValue(value);
     var oldValue = this.map[name];
     this.map[name] = oldValue ? oldValue + ", " + value : value;
   };
-  Headers.prototype["delete"] = function(name) {
+  Headers.prototype["delete"] = function (name) {
     delete this.map[normalizeName(name)];
   };
-  Headers.prototype.get = function(name) {
+  Headers.prototype.get = function (name) {
     name = normalizeName(name);
     return this.has(name) ? this.map[name] : null;
   };
-  Headers.prototype.has = function(name) {
+  Headers.prototype.has = function (name) {
     return this.map.hasOwnProperty(normalizeName(name));
   };
-  Headers.prototype.set = function(name, value) {
+  Headers.prototype.set = function (name, value) {
     this.map[normalizeName(name)] = normalizeValue(value);
   };
-  Headers.prototype.forEach = function(callback, thisArg) {
+  Headers.prototype.forEach = function (callback, thisArg) {
     for (var name in this.map) {
       if (this.map.hasOwnProperty(name)) {
         callback.call(thisArg, this.map[name], name, this);
       }
     }
   };
-  Headers.prototype.keys = function() {
+  Headers.prototype.keys = function () {
     var items = [];
-    this.forEach(function(value, name) {
+    this.forEach(function (value, name) {
       items.push(name);
     });
     return iteratorFor(items);
   };
-  Headers.prototype.values = function() {
+  Headers.prototype.values = function () {
     var items = [];
-    this.forEach(function(value) {
+    this.forEach(function (value) {
       items.push(value);
     });
     return iteratorFor(items);
   };
-  Headers.prototype.entries = function() {
+  Headers.prototype.entries = function () {
     var items = [];
-    this.forEach(function(value, name) {
+    this.forEach(function (value, name) {
       items.push([name, value]);
     });
     return iteratorFor(items);
@@ -161,19 +181,18 @@ var ollamaJs = (() => {
     Headers.prototype[Symbol.iterator] = Headers.prototype.entries;
   }
   function consumed(body) {
-    if (body._noBody)
-      return;
+    if (body._noBody) return;
     if (body.bodyUsed) {
       return Promise.reject(new TypeError("Already read"));
     }
     body.bodyUsed = true;
   }
   function fileReaderReady(reader) {
-    return new Promise(function(resolve, reject) {
-      reader.onload = function() {
+    return new Promise(function (resolve, reject) {
+      reader.onload = function () {
         resolve(reader.result);
       };
-      reader.onerror = function() {
+      reader.onerror = function () {
         reject(reader.error);
       };
     });
@@ -211,7 +230,7 @@ var ollamaJs = (() => {
   }
   function Body() {
     this.bodyUsed = false;
-    this._initBody = function(body) {
+    this._initBody = function (body) {
       this.bodyUsed = this.bodyUsed;
       this._bodyInit = body;
       if (!body) {
@@ -223,12 +242,18 @@ var ollamaJs = (() => {
         this._bodyBlob = body;
       } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
         this._bodyFormData = body;
-      } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
+      } else if (
+        support.searchParams &&
+        URLSearchParams.prototype.isPrototypeOf(body)
+      ) {
         this._bodyText = body.toString();
       } else if (support.arrayBuffer && support.blob && isDataView(body)) {
         this._bodyArrayBuffer = bufferClone(body.buffer);
         this._bodyInit = new Blob([this._bodyArrayBuffer]);
-      } else if (support.arrayBuffer && (ArrayBuffer.prototype.isPrototypeOf(body) || isArrayBufferView(body))) {
+      } else if (
+        support.arrayBuffer &&
+        (ArrayBuffer.prototype.isPrototypeOf(body) || isArrayBufferView(body))
+      ) {
         this._bodyArrayBuffer = bufferClone(body);
       } else {
         this._bodyText = body = Object.prototype.toString.call(body);
@@ -238,13 +263,19 @@ var ollamaJs = (() => {
           this.headers.set("content-type", "text/plain;charset=UTF-8");
         } else if (this._bodyBlob && this._bodyBlob.type) {
           this.headers.set("content-type", this._bodyBlob.type);
-        } else if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body)) {
-          this.headers.set("content-type", "application/x-www-form-urlencoded;charset=UTF-8");
+        } else if (
+          support.searchParams &&
+          URLSearchParams.prototype.isPrototypeOf(body)
+        ) {
+          this.headers.set(
+            "content-type",
+            "application/x-www-form-urlencoded;charset=UTF-8"
+          );
         }
       }
     };
     if (support.blob) {
-      this.blob = function() {
+      this.blob = function () {
         var rejected = consumed(this);
         if (rejected) {
           return rejected;
@@ -260,7 +291,7 @@ var ollamaJs = (() => {
         }
       };
     }
-    this.arrayBuffer = function() {
+    this.arrayBuffer = function () {
       if (this._bodyArrayBuffer) {
         var isConsumed = consumed(this);
         if (isConsumed) {
@@ -269,7 +300,8 @@ var ollamaJs = (() => {
           return Promise.resolve(
             this._bodyArrayBuffer.buffer.slice(
               this._bodyArrayBuffer.byteOffset,
-              this._bodyArrayBuffer.byteOffset + this._bodyArrayBuffer.byteLength
+              this._bodyArrayBuffer.byteOffset +
+                this._bodyArrayBuffer.byteLength
             )
           );
         } else {
@@ -281,7 +313,7 @@ var ollamaJs = (() => {
         throw new Error("could not read as ArrayBuffer");
       }
     };
-    this.text = function() {
+    this.text = function () {
       var rejected = consumed(this);
       if (rejected) {
         return rejected;
@@ -297,23 +329,35 @@ var ollamaJs = (() => {
       }
     };
     if (support.formData) {
-      this.formData = function() {
+      this.formData = function () {
         return this.text().then(decode);
       };
     }
-    this.json = function() {
+    this.json = function () {
       return this.text().then(JSON.parse);
     };
     return this;
   }
-  var methods = ["CONNECT", "DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT", "TRACE"];
+  var methods = [
+    "CONNECT",
+    "DELETE",
+    "GET",
+    "HEAD",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+    "TRACE",
+  ];
   function normalizeMethod(method) {
     var upcased = method.toUpperCase();
     return methods.indexOf(upcased) > -1 ? upcased : method;
   }
   function Request(input, options) {
     if (!(this instanceof Request)) {
-      throw new TypeError('Please use the "new" operator, this DOM object constructor cannot be called as a function.');
+      throw new TypeError(
+        'Please use the "new" operator, this DOM object constructor cannot be called as a function.'
+      );
     }
     options = options || {};
     var body = options.body;
@@ -342,12 +386,15 @@ var ollamaJs = (() => {
     }
     this.method = normalizeMethod(options.method || this.method || "GET");
     this.mode = options.mode || this.mode || null;
-    this.signal = options.signal || this.signal || function() {
-      if ("AbortController" in g) {
-        var ctrl = new AbortController();
-        return ctrl.signal;
-      }
-    }();
+    this.signal =
+      options.signal ||
+      this.signal ||
+      (function () {
+        if ("AbortController" in g) {
+          var ctrl = new AbortController();
+          return ctrl.signal;
+        }
+      })();
     this.referrer = null;
     if ((this.method === "GET" || this.method === "HEAD") && body) {
       throw new TypeError("Body not allowed for GET or HEAD requests");
@@ -357,52 +404,68 @@ var ollamaJs = (() => {
       if (options.cache === "no-store" || options.cache === "no-cache") {
         var reParamSearch = /([?&])_=[^&]*/;
         if (reParamSearch.test(this.url)) {
-          this.url = this.url.replace(reParamSearch, "$1_=" + (/* @__PURE__ */ new Date()).getTime());
+          this.url = this.url.replace(
+            reParamSearch,
+            "$1_=" + /* @__PURE__ */ new Date().getTime()
+          );
         } else {
           var reQueryString = /\?/;
-          this.url += (reQueryString.test(this.url) ? "&" : "?") + "_=" + (/* @__PURE__ */ new Date()).getTime();
+          this.url +=
+            (reQueryString.test(this.url) ? "&" : "?") +
+            "_=" +
+            /* @__PURE__ */ new Date().getTime();
         }
       }
     }
   }
-  Request.prototype.clone = function() {
+  Request.prototype.clone = function () {
     return new Request(this, { body: this._bodyInit });
   };
   function decode(body) {
     var form = new FormData();
-    body.trim().split("&").forEach(function(bytes) {
-      if (bytes) {
-        var split = bytes.split("=");
-        var name = split.shift().replace(/\+/g, " ");
-        var value = split.join("=").replace(/\+/g, " ");
-        form.append(decodeURIComponent(name), decodeURIComponent(value));
-      }
-    });
+    body
+      .trim()
+      .split("&")
+      .forEach(function (bytes) {
+        if (bytes) {
+          var split = bytes.split("=");
+          var name = split.shift().replace(/\+/g, " ");
+          var value = split.join("=").replace(/\+/g, " ");
+          form.append(decodeURIComponent(name), decodeURIComponent(value));
+        }
+      });
     return form;
   }
   function parseHeaders(rawHeaders) {
     var headers = new Headers();
     var preProcessedHeaders = rawHeaders.replace(/\r?\n[\t ]+/g, " ");
-    preProcessedHeaders.split("\r").map(function(header) {
-      return header.indexOf("\n") === 0 ? header.substr(1, header.length) : header;
-    }).forEach(function(line) {
-      var parts = line.split(":");
-      var key = parts.shift().trim();
-      if (key) {
-        var value = parts.join(":").trim();
-        try {
-          headers.append(key, value);
-        } catch (error) {
-          console.warn("Response " + error.message);
+    preProcessedHeaders
+      .split("\r")
+      .map(function (header) {
+        return header.indexOf("\n") === 0
+          ? header.substr(1, header.length)
+          : header;
+      })
+      .forEach(function (line) {
+        var parts = line.split(":");
+        var key = parts.shift().trim();
+        if (key) {
+          var value = parts.join(":").trim();
+          try {
+            headers.append(key, value);
+          } catch (error) {
+            console.warn("Response " + error.message);
+          }
         }
-      }
-    });
+      });
     return headers;
   }
   Body.call(Request.prototype);
   function Response(bodyInit, options) {
     if (!(this instanceof Response)) {
-      throw new TypeError('Please use the "new" operator, this DOM object constructor cannot be called as a function.');
+      throw new TypeError(
+        'Please use the "new" operator, this DOM object constructor cannot be called as a function.'
+      );
     }
     if (!options) {
       options = {};
@@ -410,24 +473,27 @@ var ollamaJs = (() => {
     this.type = "default";
     this.status = options.status === void 0 ? 200 : options.status;
     if (this.status < 200 || this.status > 599) {
-      throw new RangeError("Failed to construct 'Response': The status provided (0) is outside the range [200, 599].");
+      throw new RangeError(
+        "Failed to construct 'Response': The status provided (0) is outside the range [200, 599]."
+      );
     }
     this.ok = this.status >= 200 && this.status < 300;
-    this.statusText = options.statusText === void 0 ? "" : "" + options.statusText;
+    this.statusText =
+      options.statusText === void 0 ? "" : "" + options.statusText;
     this.headers = new Headers(options.headers);
     this.url = options.url || "";
     this._initBody(bodyInit);
   }
   Body.call(Response.prototype);
-  Response.prototype.clone = function() {
+  Response.prototype.clone = function () {
     return new Response(this._bodyInit, {
       status: this.status,
       statusText: this.statusText,
       headers: new Headers(this.headers),
-      url: this.url
+      url: this.url,
     });
   };
-  Response.error = function() {
+  Response.error = function () {
     var response = new Response(null, { status: 200, statusText: "" });
     response.ok = false;
     response.status = 0;
@@ -435,7 +501,7 @@ var ollamaJs = (() => {
     return response;
   };
   var redirectStatuses = [301, 302, 303, 307, 308];
-  Response.redirect = function(url, status) {
+  Response.redirect = function (url, status) {
     if (redirectStatuses.indexOf(status) === -1) {
       throw new RangeError("Invalid status code");
     }
@@ -445,7 +511,7 @@ var ollamaJs = (() => {
   try {
     new DOMException();
   } catch (err) {
-    DOMException = function(message, name) {
+    DOMException = function (message, name) {
       this.message = message;
       this.name = name;
       var error = Error(message);
@@ -455,7 +521,7 @@ var ollamaJs = (() => {
     DOMException.prototype.constructor = DOMException;
   }
   function fetch2(input, init) {
-    return new Promise(function(resolve, reject) {
+    return new Promise(function (resolve, reject) {
       var request = new Request(input, init);
       if (request.signal && request.signal.aborted) {
         return reject(new DOMException("Aborted", "AbortError"));
@@ -464,34 +530,40 @@ var ollamaJs = (() => {
       function abortXhr() {
         xhr.abort();
       }
-      xhr.onload = function() {
+      xhr.onload = function () {
         var options = {
           statusText: xhr.statusText,
-          headers: parseHeaders(xhr.getAllResponseHeaders() || "")
+          headers: parseHeaders(xhr.getAllResponseHeaders() || ""),
         };
-        if (request.url.indexOf("file://") === 0 && (xhr.status < 200 || xhr.status > 599)) {
+        if (
+          request.url.indexOf("file://") === 0 &&
+          (xhr.status < 200 || xhr.status > 599)
+        ) {
           options.status = 200;
         } else {
           options.status = xhr.status;
         }
-        options.url = "responseURL" in xhr ? xhr.responseURL : options.headers.get("X-Request-URL");
+        options.url =
+          "responseURL" in xhr
+            ? xhr.responseURL
+            : options.headers.get("X-Request-URL");
         var body = "response" in xhr ? xhr.response : xhr.responseText;
-        setTimeout(function() {
+        setTimeout(function () {
           resolve(new Response(body, options));
         }, 0);
       };
-      xhr.onerror = function() {
-        setTimeout(function() {
+      xhr.onerror = function () {
+        setTimeout(function () {
           reject(new TypeError("Network request failed"));
         }, 0);
       };
-      xhr.ontimeout = function() {
-        setTimeout(function() {
+      xhr.ontimeout = function () {
+        setTimeout(function () {
           reject(new TypeError("Network request timed out"));
         }, 0);
       };
-      xhr.onabort = function() {
-        setTimeout(function() {
+      xhr.onabort = function () {
+        setTimeout(function () {
           reject(new DOMException("Aborted", "AbortError"));
         }, 0);
       };
@@ -515,31 +587,40 @@ var ollamaJs = (() => {
           xhr.responseType = "arraybuffer";
         }
       }
-      if (init && typeof init.headers === "object" && !(init.headers instanceof Headers || g.Headers && init.headers instanceof g.Headers)) {
+      if (
+        init &&
+        typeof init.headers === "object" &&
+        !(
+          init.headers instanceof Headers ||
+          (g.Headers && init.headers instanceof g.Headers)
+        )
+      ) {
         var names = [];
-        Object.getOwnPropertyNames(init.headers).forEach(function(name) {
+        Object.getOwnPropertyNames(init.headers).forEach(function (name) {
           names.push(normalizeName(name));
           xhr.setRequestHeader(name, normalizeValue(init.headers[name]));
         });
-        request.headers.forEach(function(value, name) {
+        request.headers.forEach(function (value, name) {
           if (names.indexOf(name) === -1) {
             xhr.setRequestHeader(name, value);
           }
         });
       } else {
-        request.headers.forEach(function(value, name) {
+        request.headers.forEach(function (value, name) {
           xhr.setRequestHeader(name, value);
         });
       }
       if (request.signal) {
         request.signal.addEventListener("abort", abortXhr);
-        xhr.onreadystatechange = function() {
+        xhr.onreadystatechange = function () {
           if (xhr.readyState === 4) {
             request.signal.removeEventListener("abort", abortXhr);
           }
         };
       }
-      xhr.send(typeof request._bodyInit === "undefined" ? null : request._bodyInit);
+      xhr.send(
+        typeof request._bodyInit === "undefined" ? null : request._bodyInit
+      );
     });
   }
   fetch2.polyfill = true;
@@ -553,7 +634,15 @@ var ollamaJs = (() => {
   // node_modules/.pnpm/ollama@0.5.11/node_modules/ollama/dist/shared/ollama.cddbc85b.mjs
   var version = "0.5.11";
   var __defProp$1 = Object.defineProperty;
-  var __defNormalProp$1 = (obj, key, value) => key in obj ? __defProp$1(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+  var __defNormalProp$1 = (obj, key, value) =>
+    key in obj
+      ? __defProp$1(obj, key, {
+          enumerable: true,
+          configurable: true,
+          writable: true,
+          value,
+        })
+      : (obj[key] = value);
   var __publicField$1 = (obj, key, value) => {
     __defNormalProp$1(obj, typeof key !== "symbol" ? key + "" : key, value);
     return value;
@@ -621,7 +710,9 @@ var ollamaJs = (() => {
   };
   function getPlatform() {
     if (typeof window !== "undefined" && window.navigator) {
-      return `${window.navigator.platform.toLowerCase()} Browser/${navigator.userAgent};`;
+      return `${window.navigator.platform.toLowerCase()} Browser/${
+        navigator.userAgent
+      };`;
     } else if (typeof process !== "undefined") {
       return `${process.arch} ${process.platform} Node.js/${process.version}`;
     }
@@ -631,37 +722,44 @@ var ollamaJs = (() => {
     const defaultHeaders = {
       "Content-Type": "application/json",
       Accept: "application/json",
-      "User-Agent": `ollama-js/${version} (${getPlatform()})`
+      "User-Agent": `ollama-js/${version} (${getPlatform()})`,
     };
     if (!options.headers) {
       options.headers = {};
     }
     const customHeaders = Object.fromEntries(
-      Object.entries(options.headers).filter(([key]) => !Object.keys(defaultHeaders).some((defaultKey) => defaultKey.toLowerCase() === key.toLowerCase()))
+      Object.entries(options.headers).filter(
+        ([key]) =>
+          !Object.keys(defaultHeaders).some(
+            (defaultKey) => defaultKey.toLowerCase() === key.toLowerCase()
+          )
+      )
     );
     options.headers = {
       ...defaultHeaders,
-      ...customHeaders
+      ...customHeaders,
     };
     return fetch3(url, options);
   };
   var get = async (fetch3, host, options) => {
     const response = await fetchWithHeaders(fetch3, host, {
-      headers: options?.headers
+      headers: options?.headers,
     });
     await checkOk(response);
     return response;
   };
   var post = async (fetch3, host, data, options) => {
     const isRecord = (input) => {
-      return input !== null && typeof input === "object" && !Array.isArray(input);
+      return (
+        input !== null && typeof input === "object" && !Array.isArray(input)
+      );
     };
     const formattedData = isRecord(data) ? JSON.stringify(data) : data;
     const response = await fetchWithHeaders(fetch3, host, {
       method: "POST",
       body: formattedData,
       signal: options?.signal,
-      headers: options?.headers
+      headers: options?.headers,
     });
     await checkOk(response);
     return response;
@@ -670,7 +768,7 @@ var ollamaJs = (() => {
     const response = await fetchWithHeaders(fetch3, host, {
       method: "DELETE",
       body: JSON.stringify(data),
-      headers: options?.headers
+      headers: options?.headers,
     });
     await checkOk(response);
     return response;
@@ -731,7 +829,15 @@ var ollamaJs = (() => {
     return formattedHost;
   };
   var __defProp2 = Object.defineProperty;
-  var __defNormalProp = (obj, key, value) => key in obj ? __defProp2(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+  var __defNormalProp = (obj, key, value) =>
+    key in obj
+      ? __defProp2(obj, key, {
+          enumerable: true,
+          configurable: true,
+          writable: true,
+          value,
+        })
+      : (obj[key] = value);
   var __publicField = (obj, key, value) => {
     __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
     return value;
@@ -743,7 +849,7 @@ var ollamaJs = (() => {
       __publicField(this, "ongoingStreamedRequests", []);
       this.config = {
         host: "",
-        headers: config?.headers
+        headers: config?.headers,
       };
       if (!config?.proxy) {
         this.config.host = formatHost(config?.host ?? "http://127.0.0.1:11434");
@@ -775,7 +881,7 @@ var ollamaJs = (() => {
         const abortController = new AbortController();
         const response2 = await post(this.fetch, host, request, {
           signal: abortController.signal,
-          headers: this.config.headers
+          headers: this.config.headers,
         });
         if (!response2.body) {
           throw new Error("Missing body");
@@ -785,7 +891,9 @@ var ollamaJs = (() => {
           abortController,
           itr,
           () => {
-            const i = this.ongoingStreamedRequests.indexOf(abortableAsyncIterator);
+            const i = this.ongoingStreamedRequests.indexOf(
+              abortableAsyncIterator
+            );
             if (i > -1) {
               this.ongoingStreamedRequests.splice(i, 1);
             }
@@ -795,15 +903,15 @@ var ollamaJs = (() => {
         return abortableAsyncIterator;
       }
       const response = await post(this.fetch, host, request, {
-        headers: this.config.headers
+        headers: this.config.headers,
       });
       return await response.json();
     }
     /**
-    * Encodes an image to base64 if it is a Uint8Array.
-    * @param image {Uint8Array | string} - The image to encode.
-    * @returns {Promise<string>} - The base64 encoded image.
-    */
+     * Encodes an image to base64 if it is a Uint8Array.
+     * @param image {Uint8Array | string} - The image to encode.
+     * @returns {Promise<string>} - The base64 encoded image.
+     */
     async encodeImage(image) {
       if (typeof image !== "string") {
         const uint8Array = new Uint8Array(image);
@@ -824,7 +932,9 @@ var ollamaJs = (() => {
      */
     async generate(request) {
       if (request.images) {
-        request.images = await Promise.all(request.images.map(this.encodeImage.bind(this)));
+        request.images = await Promise.all(
+          request.images.map(this.encodeImage.bind(this))
+        );
       }
       return this.processStreamableRequest("generate", request);
     }
@@ -858,7 +968,7 @@ var ollamaJs = (() => {
         name: request.model,
         stream: request.stream,
         modelfile: request.modelfile,
-        quantize: request.quantize
+        quantize: request.quantize,
       });
     }
     /**
@@ -872,7 +982,7 @@ var ollamaJs = (() => {
       return this.processStreamableRequest("pull", {
         name: request.model,
         stream: request.stream,
-        insecure: request.insecure
+        insecure: request.insecure,
       });
     }
     /**
@@ -886,7 +996,7 @@ var ollamaJs = (() => {
       return this.processStreamableRequest("push", {
         name: request.model,
         stream: request.stream,
-        insecure: request.insecure
+        insecure: request.insecure,
       });
     }
     /**
@@ -911,9 +1021,14 @@ var ollamaJs = (() => {
      * @returns {Promise<StatusResponse>} - The response object.
      */
     async copy(request) {
-      await post(this.fetch, `${this.config.host}/api/copy`, { ...request }, {
-        headers: this.config.headers
-      });
+      await post(
+        this.fetch,
+        `${this.config.host}/api/copy`,
+        { ...request },
+        {
+          headers: this.config.headers,
+        }
+      );
       return { status: "success" };
     }
     /**
@@ -923,7 +1038,7 @@ var ollamaJs = (() => {
      */
     async list() {
       const response = await get(this.fetch, `${this.config.host}/api/tags`, {
-        headers: this.config.headers
+        headers: this.config.headers,
       });
       return await response.json();
     }
@@ -933,11 +1048,16 @@ var ollamaJs = (() => {
      * @returns {Promise<ShowResponse>} - The response object.
      */
     async show(request) {
-      const response = await post(this.fetch, `${this.config.host}/api/show`, {
-        ...request
-      }, {
-        headers: this.config.headers
-      });
+      const response = await post(
+        this.fetch,
+        `${this.config.host}/api/show`,
+        {
+          ...request,
+        },
+        {
+          headers: this.config.headers,
+        }
+      );
       return await response.json();
     }
     /**
@@ -946,11 +1066,16 @@ var ollamaJs = (() => {
      * @returns {Promise<EmbedResponse>} - The response object.
      */
     async embed(request) {
-      const response = await post(this.fetch, `${this.config.host}/api/embed`, {
-        ...request
-      }, {
-        headers: this.config.headers
-      });
+      const response = await post(
+        this.fetch,
+        `${this.config.host}/api/embed`,
+        {
+          ...request,
+        },
+        {
+          headers: this.config.headers,
+        }
+      );
       return await response.json();
     }
     /**
@@ -959,11 +1084,16 @@ var ollamaJs = (() => {
      * @returns {Promise<EmbeddingsResponse>} - The response object.
      */
     async embeddings(request) {
-      const response = await post(this.fetch, `${this.config.host}/api/embeddings`, {
-        ...request
-      }, {
-        headers: this.config.headers
-      });
+      const response = await post(
+        this.fetch,
+        `${this.config.host}/api/embeddings`,
+        {
+          ...request,
+        },
+        {
+          headers: this.config.headers,
+        }
+      );
       return await response.json();
     }
     /**
@@ -973,11 +1103,11 @@ var ollamaJs = (() => {
      */
     async ps() {
       const response = await get(this.fetch, `${this.config.host}/api/ps`, {
-        headers: this.config.headers
+        headers: this.config.headers,
       });
       return await response.json();
     }
   };
   var browser = new Ollama$1();
-  return __toCommonJS(browser_exports);
+  return browser;
 })();
