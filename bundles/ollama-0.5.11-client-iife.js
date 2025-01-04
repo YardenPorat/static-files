@@ -1109,5 +1109,5 @@ var ollamaJs = (() => {
     }
   };
   var browser = new Ollama$1();
-  return browser;
+  return __toCommonJS(browser_exports);
 })();
